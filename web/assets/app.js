@@ -5,6 +5,7 @@ const LABELS = {
 };
 
 const TYPES = ["sent", "delivered", "opened", "clicked"];
+const DISPLAY_TIME_ZONE = "Asia/Kolkata";
 const state = { campaign: "cmp_summer_sale", lastSeed: null, refreshGen: 0 };
 
 const $ = (id) => document.getElementById(id);
@@ -23,7 +24,11 @@ function prettyCampaign(id) {
 }
 
 function tickClock() {
-  $("clock").textContent = new Date().toLocaleString();
+  $("clock").textContent = new Date().toLocaleString("en-IN", {
+    timeZone: DISPLAY_TIME_ZONE,
+    dateStyle: "medium",
+    timeStyle: "medium",
+  }) + " IST";
 }
 
 async function api(path, opts) {
@@ -105,6 +110,22 @@ function metaText(meta) {
   }
 }
 
+function formatEventTimestamp(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value || "");
+  return date.toLocaleString("sv-SE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    fractionalSecondDigits: 3,
+    hour12: false,
+    timeZone: DISPLAY_TIME_ZONE,
+  });
+}
+
 function renderActivity(page) {
   const rows = page.events || [];
   if (!rows.length) {
@@ -113,7 +134,7 @@ function renderActivity(page) {
   }
   $("activity").innerHTML = rows
     .map((ev) => {
-      const ts = String(ev.timestamp || "").replace("T", " ").replace("Z", "");
+      const ts = formatEventTimestamp(ev.timestamp);
       return `
       <tr>
         <td class="mono">${ts}</td>
@@ -182,7 +203,7 @@ async function postEvents(batch) {
 }
 
 function setBusy(busy) {
-  ["btn-seed", "btn-retry", "btn-live", "btn-conflict"].forEach((id) => {
+  ["btn-seed", "btn-retry", "btn-live", "btn-live-click", "btn-live-delivered", "btn-conflict"].forEach((id) => {
     $(id).disabled = busy;
   });
 }
@@ -217,6 +238,40 @@ $("btn-live").onclick = async () => {
         campaign_id: state.campaign,
         contact_id: "ct_demo",
         type: "opened",
+        timestamp: new Date().toISOString(),
+      },
+    ]);
+  } finally {
+    setBusy(false);
+  }
+};
+
+$("btn-live-click").onclick = async () => {
+  setBusy(true);
+  try {
+    await postEvents([
+      {
+        event_id: `evt_live_click_${Date.now()}`,
+        campaign_id: state.campaign,
+        contact_id: "ct_demo",
+        type: "clicked",
+        timestamp: new Date().toISOString(),
+      },
+    ]);
+  } finally {
+    setBusy(false);
+  }
+};
+
+$("btn-live-delivered").onclick = async () => {
+  setBusy(true);
+  try {
+    await postEvents([
+      {
+        event_id: `evt_live_delivered_${Date.now()}`,
+        campaign_id: state.campaign,
+        contact_id: "ct_demo",
+        type: "delivered",
         timestamp: new Date().toISOString(),
       },
     ]);

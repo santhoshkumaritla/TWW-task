@@ -44,6 +44,8 @@ Open `http://localhost:8080/` locally or the live deployment URL in a browser. T
 - **Load provider seed** uploads `seed/events.json`.
 - **Replay same batch** simulates a provider retry. Existing `event_id` values become duplicates and are not counted again.
 - **Fire live open** creates a new `opened` event for the selected campaign.
+- **Fire live click** creates a new `clicked` event for the selected campaign.
+- **Fire live delivered** creates a new `delivered` event for the selected campaign.
 - **Send conflicting retry** reuses an existing ID with different fields. The first stored payload still wins and the response reports a payload conflict.
 
 The dashboard shows event totals, unique contacts, observed rates, and recent activity. The `events` counts count distinct provider events; `unique_opens` counts distinct contacts who opened.
