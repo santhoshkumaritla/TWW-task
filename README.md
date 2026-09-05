@@ -2,6 +2,10 @@
 
 Go HTTP service that accepts provider webhook events and serves per-campaign stats for a live dashboard. In-memory store, stdlib only. No auth. Open `http://localhost:8080/` for the demo UI. The original company pack (assignment text, skeleton, fixtures) is under `candidate-only/`; this root module is what to run.
 
+Live deployment: https://tww-task.onrender.com
+
+The frontend and backend are deployed together as one Go web service. The frontend is embedded into the Go binary and uses the same URL as the API.
+
 Requires Go 1.22+ (`http.ServeMux` method+path patterns).
 
 ```
@@ -25,6 +29,39 @@ PowerShell:
 Invoke-RestMethod -Method POST -Uri http://localhost:8080/events -ContentType application/json -InFile seed/events.json
 Invoke-RestMethod http://localhost:8080/campaigns/cmp_summer_sale/stats
 ```
+
+Command Prompt with the deployed service:
+
+```
+curl.exe -X POST https://tww-task.onrender.com/events -H "Content-Type: application/json" --data-binary "@seed\\events.json"
+curl.exe https://tww-task.onrender.com/campaigns/cmp_summer_sale/stats
+```
+
+## UI workflow
+
+Open `http://localhost:8080/` locally or the live deployment URL in a browser. The dashboard loads the campaign list, lifetime stats, and recent events from the API, then refreshes every four seconds.
+
+- **Load provider seed** uploads `seed/events.json`.
+- **Replay same batch** simulates a provider retry. Existing `event_id` values become duplicates and are not counted again.
+- **Fire live open** creates a new `opened` event for the selected campaign.
+- **Send conflicting retry** reuses an existing ID with different fields. The first stored payload still wins and the response reports a payload conflict.
+
+The dashboard shows event totals, unique contacts, observed rates, and recent activity. The `events` counts count distinct provider events; `unique_opens` counts distinct contacts who opened.
+
+## Deploy with Render
+
+Create a Render Web Service from the `main` branch of `santhoshkumaritla/TWW-task` with these settings:
+
+```
+Runtime: Go
+Build Command: go build -o app .
+Start Command: ./app
+Root Directory: leave blank
+```
+
+The application reads Render's `PORT` environment variable and uses port `8080` locally when `PORT` is not set. No environment variables are required for this demo. Pushing a new commit to `main` triggers a new deployment.
+
+The store is in memory, so events are cleared when the service restarts or redeploys. A persistent database is required for production data retention.
 
 ## Endpoints
 
