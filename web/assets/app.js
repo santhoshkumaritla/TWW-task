@@ -123,7 +123,7 @@ function formatEventTimestamp(value) {
     fractionalSecondDigits: 3,
     hour12: false,
     timeZone: DISPLAY_TIME_ZONE,
-  });
+  }) + " IST";
 }
 
 function renderActivity(page) {
