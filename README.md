@@ -1,0 +1,64 @@
+# Campaign Events
+
+Go HTTP service that accepts provider webhook events and serves per-campaign stats for a live dashboard. In-memory store, stdlib only. No auth. Open `http://localhost:8080/` for the demo UI. The original company pack (assignment text, skeleton, fixtures) is under `candidate-only/`; this root module is what to run.
+
+Requires Go 1.22+ (`http.ServeMux` method+path patterns).
+
+```
+go test
+go run .
+```
+
+Listens on `http://localhost:8080`.
+
+```
+curl -s -X POST localhost:8080/events -H "Content-Type: application/json" --data-binary @seed/events.json
+
+curl -s localhost:8080/campaigns/cmp_summer_sale/stats
+
+curl -s "localhost:8080/campaigns/cmp_summer_sale/events?limit=10"
+```
+
+PowerShell:
+
+```
+Invoke-RestMethod -Method POST -Uri http://localhost:8080/events -ContentType application/json -InFile seed/events.json
+Invoke-RestMethod http://localhost:8080/campaigns/cmp_summer_sale/stats
+```
+
+## Endpoints
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/events` | JSON **array** of event objects. |
+| GET | `/campaigns/{campaign_id}/stats` | Lifetime counts. Unknown campaign → zeros, not 404. |
+| GET | `/campaigns/{campaign_id}/events` | Optional. Newest-first by provider `timestamp`. `?limit=` (default 50, max 200) and `?cursor=`. |
+
+### POST /events
+
+- **200** if the body is a JSON array, even when some items are invalid or duplicates. Providers retry on non-2xx; rejecting a mixed batch would make them resend events we already stored.
+- **400** if the body is not a JSON array (object, truncated JSON, too large).
+- Each array element is decoded on its own (`[]json.RawMessage`). One malformed object does not discard the rest.
+- Response: `{ accepted, duplicates, rejected, rejected_items, payload_conflicts }`.
+
+### Identity
+
+Same event = same `event_id`. First accepted write wins. A later POST with that id is a duplicate (200, counts unchanged). If campaign/contact/type/timestamp disagree, it is still a duplicate, plus `payload_conflicts`.
+
+### Stats
+
+- `events` — distinct `event_id`s per type (the dashboard “how many were sent/delivered/opened/clicked” if that means unique provider events).
+- `unique_contacts` / `unique_opens` — distinct people. Two opens by the same contact count as 2 events and 1 unique open.
+- No funnel. An `opened` that arrives before `delivered` still counts as an open. Opened may be greater than delivered.
+- Late events count; `timestamp` is not compared to wall clock.
+
+Invalid: missing ids, empty `contact_id`, type not exactly `sent|delivered|opened|clicked` (so `OPENED` and `spam_report` reject), timestamp not RFC3339.
+
+## Part 3
+
+```
+cd debugging
+go run . events.jsonl
+```
+
+Must match `expected_output.txt`. See `BUGS.md`.

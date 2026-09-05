@@ -1,0 +1,183 @@
+:root {
+  --ink: #14110e;
+  --paper: #efe6d4;
+  --paper-2: #e4d7bc;
+  --panel: #f7f1e4;
+  --line: rgba(20, 17, 14, 0.12);
+  --muted: #6f675c;
+  --sent: #2f5d8c;
+  --delivered: #1f7a62;
+  --opened: #c45c26;
+  --clicked: #8b3d6b;
+  --shadow: 0 18px 50px rgba(40, 28, 12, 0.12);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 500px at 10% -10%, #f4d7a8 0%, transparent 55%),
+    radial-gradient(900px 400px at 100% 0%, #d7eadc 0%, transparent 50%),
+    var(--paper);
+}
+
+.grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  opacity: 0.18;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+code, time, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+.top {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 24px;
+  align-items: end;
+  padding: 28px 36px 12px;
+}
+.brand { display: flex; gap: 14px; align-items: center; }
+.mark {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: conic-gradient(from 210deg, #c45c26, #1f7a62, #2f5d8c, #c45c26);
+  box-shadow: var(--shadow);
+}
+.eyebrow { margin: 0; letter-spacing: 0.16em; text-transform: uppercase; font-size: 11px; color: var(--muted); font-weight: 600; }
+h1, h2 { margin: 0; letter-spacing: -0.03em; }
+h1 { font-size: 28px; }
+h2 { font-size: 16px; }
+.lede { margin: 0; max-width: 42ch; color: #3d3831; }
+.top-meta { text-align: right; }
+.pill {
+  display: inline-block;
+  border: 1px solid var(--line);
+  background: #fff8ea;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.pill.ok { background: #def4ea; }
+.pill.warn { background: #fbe3d4; }
+time { display: block; margin-top: 8px; font-size: 12px; color: var(--muted); }
+
+.layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  padding: 16px 36px 40px;
+}
+.rail { display: flex; flex-direction: column; gap: 16px; }
+.stage { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.muted, .hint, .as-of { color: var(--muted); font-size: 12px; }
+.hint { margin: 0 0 12px; line-height: 1.4; }
+
+.campaign-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.campaign-list button {
+  width: 100%;
+  text-align: left;
+  border: 1px solid transparent;
+  background: #fff8ea;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font: inherit;
+}
+.campaign-list button.active { border-color: var(--ink); background: #fff; }
+.campaign-list strong { display: block; }
+.campaign-list span { font-size: 12px; color: var(--muted); font-family: "IBM Plex Mono", monospace; }
+
+.btn {
+  width: 100%;
+  margin-top: 8px;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn.primary { background: var(--ink); color: var(--paper); }
+.btn:hover { transform: translateY(-1px); }
+.btn:disabled { opacity: 0.5; cursor: wait; transform: none; }
+
+.ingest {
+  margin-top: 14px;
+  padding: 10px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.ingest b { font-family: "IBM Plex Mono", monospace; }
+
+.stage-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; padding: 4px 4px 0; }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.kpi {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.kpi .label { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+.kpi .num { font-size: 40px; letter-spacing: -0.05em; margin: 8px 0 0; }
+.kpi.sent { border-top: 5px solid var(--sent); }
+.kpi.delivered { border-top: 5px solid var(--delivered); }
+.kpi.opened { border-top: 5px solid var(--opened); }
+.kpi.clicked { border-top: 5px solid var(--clicked); }
+
+.grid-2 { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px; }
+.compare, .rates { display: flex; flex-direction: column; gap: 12px; }
+.row { display: grid; grid-template-columns: 88px 1fr 48px; gap: 10px; align-items: center; font-size: 13px; }
+.bar { height: 10px; background: var(--paper-2); border-radius: 99px; overflow: hidden; }
+.bar > i { display: block; height: 100%; border-radius: 99px; }
+.bar.people > i { opacity: 0.55; }
+
+.table-wrap { overflow: auto; max-height: 360px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 8px; }
+td { padding: 8px; border-top: 1px solid var(--line); vertical-align: top; }
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.badge.sent { background: #d7e6f4; color: var(--sent); }
+.badge.delivered { background: #d7efe7; color: var(--delivered); }
+.badge.opened { background: #f8ddd0; color: var(--opened); }
+.badge.clicked { background: #f0d6e5; color: var(--clicked); }
+
+.empty { color: var(--muted); padding: 18px 8px; }
+
+@media (max-width: 980px) {
+  .top, .layout { grid-template-columns: 1fr; padding-left: 16px; padding-right: 16px; }
+  .kpis, .grid-2 { grid-template-columns: 1fr 1fr; }
+}
